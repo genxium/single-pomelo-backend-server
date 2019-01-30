@@ -26,11 +26,15 @@ app.set('name', 'single-pomelo-backend-server');
 The sio connector will deem client as "timed out to close" if no new "client -(pong)->server" is received after NO LONGER THAN (heartbeatIntervalMillis + heartbeatTimeoutMillis) since the last "client -(pong)->server". Reference "https://socket.io/docs/server-api/".
 
 Meaning of these fields are as follows.
+
 - The client side sdk will receive fields "pingInterval = heartbeatIntervalMillis" and "pingTimeout = heartbeatTimeoutMillis" for session negotiation upon connection established. 
+
 - The client side will send a "ping" every "pingInterval" milliseconds to the server, and expect a "pong" within "pingTimeout" milliseconds till it deems that the server is unavailable.
 
+- The socket.io-server will reset its session watchdog for another "(pingInterval + pingTimeout) == (heartbeatIntervalMillis + heartbeatTimeoutMillis)", within which ANY packet from the client side (including but not limited to "ping") should be received to maintain the session, and as well reset the session watchdog. Hence "pingInterval" is recommended to be way less than "pingTimeout" to ensure sufficient tolerance of packet loss.  
+
 */
-const heartbeatIntervalMillis = 10000;
+const heartbeatIntervalMillis = 1000;
 const heartbeatTimeoutMillis = 10000;
 const closeTimeoutMillis = 10000;
 
